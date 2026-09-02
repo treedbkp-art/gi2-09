@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import "@/App.css";
+import "./styles/blog.css";
 
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
@@ -14,6 +15,10 @@ import GiReboot from "./pages/GiReboot";
 import Contato from "./pages/Contato";
 import Eva from "./pages/Eva";
 import Matrizes from "./pages/Matrizes";
+import Artigos from "./pages/Artigos";
+import ArtigoDetail from "./pages/ArtigoDetail";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -73,6 +78,10 @@ function Shell() {
         <Route path="/eva" element={<Eva />} />
         <Route path="/matrizes" element={<Matrizes />} />
         <Route path="/contato" element={<Contato />} />
+        <Route path="/artigos" element={<Artigos />} />
+        <Route path="/artigos/:slug" element={<ArtigoDetail />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
       <Footer />
       <FloatingWhatsApp />

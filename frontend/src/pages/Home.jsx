@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -6,6 +6,7 @@ import MouseTrail from "../components/MouseTrail";
 import SectionDivider from "../components/SectionDivider";
 import SustainMarquee from "../components/SustainMarquee";
 import { useReveal, splitWords } from "../lib/useReveal";
+import { listArticles } from "../lib/api";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -125,18 +126,24 @@ const NEON_ICONS = [
 ];
 
 // ===================== SEÇÃO 4 — CONTEÚDOS TÉCNICOS (BLOG) =====================
-const ARTIGOS = [
+const ARTIGOS_FALLBACK = [
   {
-    t: "Quando faz sentido usar E-TPU (Gi Reboot®) junto com EVA no seu projeto",
-    d: "Entenda em quais tipos de calçados e componentes industriais o E-TPU complementa o EVA, aumentando conforto e durabilidade sem complicar o processo produtivo.",
+    slug: "e-tpu-eva-projeto",
+    title: "Quando faz sentido usar E-TPU (Gi Reboot®) junto com EVA no seu projeto",
+    excerpt:
+      "Entenda em quais tipos de calçados e componentes industriais o E-TPU complementa o EVA, aumentando conforto e durabilidade sem complicar o processo produtivo.",
   },
   {
-    t: "Como escolher matrizes e solados em EVA para linhas esportivas e casuais",
-    d: "Pontos técnicos que P&D e desenvolvimento de produto precisam considerar ao definir matrizes e solados em EVA para tênis e calçados casuais.",
+    slug: "matrizes-solados-eva-esportivos",
+    title: "Como escolher matrizes e solados em EVA para linhas esportivas e casuais",
+    excerpt:
+      "Pontos técnicos que P&D e desenvolvimento de produto precisam considerar ao definir matrizes e solados em EVA para tênis e calçados casuais.",
   },
   {
-    t: "Linhas sustentáveis em EVA: o que muda com Recovery e Green",
-    d: "Como funcionam os compostos com conteúdo reciclado e de origem renovável e onde eles se encaixam em linhas de calçados e outros componentes.",
+    slug: "linhas-sustentaveis-recovery-green",
+    title: "Linhas sustentáveis em EVA: o que muda com Recovery e Green",
+    excerpt:
+      "Como funcionam os compostos com conteúdo reciclado e de origem renovável e onde eles se encaixam em linhas de calçados e outros componentes.",
   },
 ];
 
@@ -146,6 +153,21 @@ export default function Home() {
   const footprintRef = useRef(null);
   const solucoesBgRef = useRef(null);
   const sustainStackRef = useRef(null);
+  const [artigos, setArtigos] = useState(ARTIGOS_FALLBACK);
+
+  // Fetch dos artigos publicados; se falhar, mantém fallback
+  useEffect(() => {
+    let alive = true;
+    listArticles()
+      .then((data) => {
+        if (!alive) return;
+        if (Array.isArray(data) && data.length > 0) {
+          setArtigos(data.slice(0, 6));
+        }
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   // ====== PARALLAX — Fundo da seção "Soluções técnicas" ======
   // O background se move mais lentamente que o scroll da página,
@@ -602,20 +624,26 @@ export default function Home() {
           </p>
 
           <div className="blog-grid mt-xl">
-            {ARTIGOS.map((a, i) => (
-              <article className="blog-card reveal" key={a.t} data-cursor="Ler artigo">
+            {artigos.map((a, i) => (
+              <Link
+                to={`/artigos/${a.slug}`}
+                className="blog-card artigo-card-appear"
+                style={{ animationDelay: `${i * 80}ms` }}
+                key={a.slug || a.title}
+                data-cursor="Ler artigo"
+              >
                 <span className="blog-card-index">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="blog-card-title">{a.t}</h3>
-                <p className="blog-card-excerpt">{a.d}</p>
+                <h3 className="blog-card-title">{a.title}</h3>
+                <p className="blog-card-excerpt">{a.excerpt}</p>
                 <span className="link-arrow">Ler artigo <span className="arrow">→</span></span>
-              </article>
+              </Link>
             ))}
           </div>
 
           <div className="reveal mt-xl">
-            <span className="link-arrow" data-cursor="Ver">
+            <Link to="/artigos" className="link-arrow" data-cursor="Ver">
               Ver todos os artigos <span className="arrow">→</span>
-            </span>
+            </Link>
           </div>
         </div>
       </section>
