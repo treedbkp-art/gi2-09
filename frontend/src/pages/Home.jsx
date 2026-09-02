@@ -162,7 +162,7 @@ export default function Home() {
       .then((data) => {
         if (!alive) return;
         if (Array.isArray(data) && data.length > 0) {
-          setArtigos(data.slice(0, 6));
+          setArtigos(data.slice(0, 3));
         }
       })
       .catch(() => {});
