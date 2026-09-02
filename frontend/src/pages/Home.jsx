@@ -6,7 +6,7 @@ import MouseTrail from "../components/MouseTrail";
 import SectionDivider from "../components/SectionDivider";
 import SustainMarquee from "../components/SustainMarquee";
 import { useReveal, splitWords } from "../lib/useReveal";
-import { listArticles } from "../lib/api";
+import { listArticles, resolveMediaUrl } from "../lib/api";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -627,15 +627,26 @@ export default function Home() {
             {artigos.map((a, i) => (
               <Link
                 to={`/artigos/${a.slug}`}
-                className="blog-card artigo-card-appear"
+                className={`blog-card artigo-card-appear${a.cover_image ? " blog-card--with-media" : ""}`}
                 style={{ animationDelay: `${i * 80}ms` }}
                 key={a.slug || a.title}
                 data-cursor="Ler artigo"
               >
-                <span className="blog-card-index">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="blog-card-title">{a.title}</h3>
-                <p className="blog-card-excerpt">{a.excerpt}</p>
-                <span className="link-arrow">Ler artigo <span className="arrow">→</span></span>
+                {a.cover_image ? (
+                  <div className="blog-card-media">
+                    <img
+                      src={resolveMediaUrl(a.cover_image)}
+                      alt={a.title}
+                      loading="lazy"
+                    />
+                  </div>
+                ) : null}
+                <div className="blog-card-body">
+                  <span className="blog-card-index">{String(i + 1).padStart(2, "0")}</span>
+                  <h3 className="blog-card-title">{a.title}</h3>
+                  <p className="blog-card-excerpt">{a.excerpt}</p>
+                  <span className="link-arrow">Ler artigo <span className="arrow">→</span></span>
+                </div>
               </Link>
             ))}
           </div>
